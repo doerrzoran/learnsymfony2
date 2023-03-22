@@ -1,0 +1,12 @@
+{% extends 'legacy.html.twig' %}
+
+{% block title %}
+    Nouveau Titre
+{% endblock %}
+
+{% block body %}
+    {{
+        parent()
+    }}
+    <div>nouveau contenu</div>
+{% endblock %}

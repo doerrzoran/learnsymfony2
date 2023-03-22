@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+#[Route("/todo")]
 class ToDoController extends AbstractController
 {
     #[Route('/to/do', name: 'to_do')]
@@ -27,7 +28,7 @@ class ToDoController extends AbstractController
         //si j'ai mon tableau todo dans ma session je ne fais que l'afficher  
         return $this->render('to_do/index.html.twig');
     }
-    #[Route('/to/do/add/{name}/{content} ', name: 'to_do.add')]
+    #[Route('/to/do/add/{name?test}/{content?test} ', name: 'to_do.add')]
     public function addToDo(Request $request, $name, $content) {
         $session = $request->getSession();
         // Verifier si j'ai mon tableau todo dans la session
@@ -53,4 +54,10 @@ class ToDoController extends AbstractController
         }
         return $this->redirectToRoute('to_do');
     }
+
+    #[Route('/multi/{entier1}<\d+>/{entier2<\d+>}')]
+    public function multiplication($entier1, $entier2){
+        $resultat = $entier1 * $entier2;
+        return new Response($resultat);
+    }    
 }
