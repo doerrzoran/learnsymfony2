@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -62,15 +63,35 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/add', name: 'personne.add')]
-    public function addPersonne(ManagerRegistry $doctrine): Response
+    public function addPersonne(ManagerRegistry $doctrine, Request $request): Response
     {
-        $entityManager = $doctrine->getManager();
+        
         $personne = new Personne();
         $form = $this->createForm(PersonneType::class, $personne);
+        $form->remove('createdAt');
+        $form->remove('updatedAt');
+        //traitement de la requete
+        $form->handleRequest($request);
+        //est-ce que le formulaire à été soumis ?
+        if ($form->isSubmitted()) {
+            //si oui
+            //on va ajouter l'objet personne dans la base de données
+            $entityManager = $doctrine->getManager();
+            $entityManager->persist($personne);
+        
 
-        return $this->render('personne/add-personne.html.twig', [
+            $entityManager->flush();
+            //afficher message de succès
+            $this->addFlash($personne->getName(), " à été ajouté");
+            // Rediriger vers la liste des personnes
+            return $this->redirectToRoute('/');
+        } else {
+            //sinon
+             // on affiche le formulaire
+            return $this->render('personne/add-personne.html.twig', [
             'form' => $form->createView()
-        ]);
+        ]); 
+        }
     }
 
     #[Route('/delete/{id<\d+>} ', name: 'personne.delete')]
