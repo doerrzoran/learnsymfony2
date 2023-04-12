@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Personne;
+use App\Form\PersonneType;
 use App\Repository\PersonneRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
@@ -65,16 +66,10 @@ class PersonneController extends AbstractController
     {
         $entityManager = $doctrine->getManager();
         $personne = new Personne();
-        $personne->setFirstname('Abdel');
-        $personne->setName('Woush');
-        $personne->SetAge(32);
+        $form = $this->createForm(PersonneType::class, $personne);
 
-        $entityManager->persist($personne);
-        $entityManager->flush();
-
-
-        return $this->render('personne/detail.html.twig', [
-            'personne' => $personne
+        return $this->render('personne/add-personne.html.twig', [
+            'form' => $form->createView()
         ]);
     }
 
