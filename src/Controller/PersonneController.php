@@ -62,11 +62,15 @@ class PersonneController extends AbstractController
         ] );
     }
 
-    #[Route('/add', name: 'personne.add')]
-    public function addPersonne(ManagerRegistry $doctrine, Request $request): Response
+    #[Route('/edit/{id?0}', name: 'personne.edit')]
+    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, Request $request): Response
     {
+        $new = false;
+        if (!$personne) {
+            $new = true;
+            $personne = new Personne();
+        }
         
-        $personne = new Personne();
         $form = $this->createForm(PersonneType::class, $personne);
         $form->remove('createdAt');
         $form->remove('updatedAt');
@@ -82,15 +86,23 @@ class PersonneController extends AbstractController
 
             $entityManager->flush();
             //afficher message de succès
-            $this->addFlash($personne->getName(), " à été ajouté");
+            
+        
+            if ($new) {
+                $messsage = " à été ajouté avec succes";
+            } else {
+                $messsage = " à été mis à jour avec succès avec succes";
+            }
+            
+            $this->addFlash('success', $personne->getName().$messsage);
             // Rediriger vers la liste des personnes
-            return $this->redirectToRoute('/');
+            return $this->redirectToRoute('personne.list');
         } else {
             //sinon
              // on affiche le formulaire
             return $this->render('personne/add-personne.html.twig', [
-            'form' => $form->createView()
-        ]); 
+                'form' => $form->createView()
+            ]); 
         }
     }
 
