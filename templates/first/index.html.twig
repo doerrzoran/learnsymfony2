@@ -5,7 +5,7 @@
 
 {% block body %}
     <h2>hello {{firstname}} {{name}} </h2>
-    <img src="{{ asset('assets/image/') ~ path | defaultImage }}">
+    <img src="{{ 'assets/image/' ~ path | defaultImage }}">
     Je veux aller sur cet url absolue : {{ url('first') }}
 {% endblock %}
 

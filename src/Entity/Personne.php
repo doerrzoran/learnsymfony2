@@ -40,6 +40,9 @@ class Personne
     #[ORM\ManyToOne(inversedBy: 'personnes')]
     private ?Job $job = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $image = null;
+
    
     public function __construct()
     {
@@ -132,6 +135,18 @@ class Personne
     public function setJob(?Job $job): self
     {
         $this->job = $job;
+
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
 
         return $this;
     }

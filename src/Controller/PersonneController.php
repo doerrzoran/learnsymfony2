@@ -8,10 +8,12 @@ use App\Repository\PersonneRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('personne')]
 class PersonneController extends AbstractController
@@ -24,6 +26,7 @@ class PersonneController extends AbstractController
 
         return $this->render('personne/index.html.twig', [
             'personnes' => $personnes,
+            'path' => ' ',
             'isPaginated' => true
         ] );
     }
@@ -63,7 +66,7 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/edit/{id?0}', name: 'personne.edit')]
-    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, Request $request): Response
+    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, SluggerInterface $slugger, Request $request): Response
     {
         $new = false;
         if (!$personne) {
@@ -80,14 +83,37 @@ class PersonneController extends AbstractController
         if ($form->isSubmitted()) {
             //si oui
             //on va ajouter l'objet personne dans la base de données
+
+            $photo = $form->get('photo')->getData();
+
+            // this condition is needed because the 'photo' field is not required
+            // so the PDF file must be processed only when a file is uploaded
+            if ($photo) {
+                $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$photo->guessExtension();
+
+                // Move the file to the directory where photos are stored
+                try {
+                    $photo->move(
+                        $this->getParameter('photo_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                // updates the 'photoname' property to store the PDF file name
+                // instead of its contents
+                $personne->setImage($newFilename);
+            }
             $entityManager = $doctrine->getManager();
             $entityManager->persist($personne);
         
-
             $entityManager->flush();
             //afficher message de succès
             
-        
             if ($new) {
                 $messsage = " à été ajouté avec succes";
             } else {
