@@ -6,6 +6,7 @@ use App\Entity\Personne;
 use App\Form\PersonneType;
 use App\Repository\PersonneRepository;
 use App\Services\Helpers;
+use App\Services\UploaderService;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
 use Psr\Log\LoggerInterface;
@@ -72,7 +73,7 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/edit/{id?0}', name: 'personne.edit')]
-    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, SluggerInterface $slugger, Request $request): Response
+    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, Request $request, UploaderService $uploaderService): Response
     {
         $new = false;
         if (!$personne) {
@@ -95,24 +96,9 @@ class PersonneController extends AbstractController
             // this condition is needed because the 'photo' field is not required
             // so the PDF file must be processed only when a file is uploaded
             if ($photo) {
-                $originalFilename = pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME);
-                // this is needed to safely include the file name as part of the URL
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$photo->guessExtension();
-
-                // Move the file to the directory where photos are stored
-                try {
-                    $photo->move(
-                        $this->getParameter('photo_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
-                }
-
-                // updates the 'photoname' property to store the PDF file name
-                // instead of its contents
-                $personne->setImage($newFilename);
+                $directory = $this->getParameter('photo_directory');
+            
+                $personne->setImage($uploaderService->uploadFile($photo, $directory));
             }
             $entityManager = $doctrine->getManager();
             $entityManager->persist($personne);
