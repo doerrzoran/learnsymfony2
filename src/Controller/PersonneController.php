@@ -136,8 +136,8 @@ class PersonneController extends AbstractController
     public function deletePersonne(Personne $personne = null, ManagerRegistry $doctrine): RedirectResponse{
         // recuperer la personne
         if($personne){
-            //si la personne existe => supprimer et retourner un fleshmessage de succes
             $manager = $doctrine->getManager();
+            //si la personne existe => supprimer et retourner un fleshmessage de succes
             $manager->remove($personne);
             $manager->flush();
             $this->addFlash('success', "La personne a été supprimé avec succès");
