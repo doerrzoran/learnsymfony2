@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\Entity\Personne;
 use App\Form\PersonneType;
 use App\Repository\PersonneRepository;
+use App\Services\Helpers;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -18,6 +20,9 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('personne')]
 class PersonneController extends AbstractController
 {
+    
+    public function __construct(private LoggerInterface $logger, private Helpers $helpers){}
+    
     #[Route('/', name: 'personne.list')]
     public function index(ManagerRegistry $doctrine): Response 
     {
@@ -32,8 +37,9 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls')]
-    public function indexAll(ManagerRegistry $doctrine, $page, $nbre): Response 
+    public function indexAll(ManagerRegistry $doctrine, $page, $nbre, Helpers $logger): Response 
     {
+        echo $this->helpers->sayHello();
         $repository = new PersonneRepository($doctrine);
         $nbPersonne = $repository->count([]);
         // $nbrePage = $nbPersonne / $nbre;
