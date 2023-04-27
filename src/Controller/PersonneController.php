@@ -7,6 +7,7 @@ use App\Form\PersonneType;
 use App\Repository\PersonneRepository;
 use App\Services\Helpers;
 use App\Services\MailerService;
+use App\Services\PdfService;
 use App\Services\UploaderService;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
@@ -36,6 +37,15 @@ class PersonneController extends AbstractController
             'path' => ' ',
             'isPaginated' => true
         ] );
+    }
+
+    #
+
+    #[Route("/pdf/{id}", name:"personne.pdf")]
+    public function generatePdfPersonne(Personne $personne = null, PdfService $pdf)
+    {
+        $html = $this->render('personne/detail.html.twig', ['personne' => $personne]);
+        $pdf->showPdfFile($html);
     }
 
     #[Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls')]
