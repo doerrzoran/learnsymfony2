@@ -8,7 +8,7 @@ use Symfony\Component\Mime\Email;
 class MailerService
 {
     public function __construct(private MailerInterface $mailer){}
-    public function sendEmail(): void
+    public function sendEmail($content): void
     {
         $email = (new Email())
             ->from('hello@example.com')
@@ -19,7 +19,7 @@ class MailerService
             //->priority(Email::PRIORITY_HIGH)
             ->subject('Time for Symfony Mailer!')
             ->text('sending')
-            ->html('<p>sending mail is fun</p>');
+            ->html($content);
 
         $this->mailer->send($email);
 

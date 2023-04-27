@@ -6,6 +6,7 @@ use App\Entity\Personne;
 use App\Form\PersonneType;
 use App\Repository\PersonneRepository;
 use App\Services\Helpers;
+use App\Services\MailerService;
 use App\Services\UploaderService;
 use Doctrine\Persistence\ManagerRegistry;
 use Faker\Provider\ar_JO\Person;
@@ -73,12 +74,12 @@ class PersonneController extends AbstractController
     }
 
     #[Route('/edit/{id?0}', name: 'personne.edit')]
-    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, Request $request, UploaderService $uploaderService): Response
+    public function addPersonne(Personne $personne = null, ManagerRegistry $doctrine, Request $request, UploaderService $uploaderService, MailerService $mailer): Response
     {
         $new = false;
         if (!$personne) {
             $new = true;
-            $personne = new Personne();
+            $personne = new Personne();        
         }
         
         $form = $this->createForm(PersonneType::class, $personne);
@@ -111,8 +112,10 @@ class PersonneController extends AbstractController
             } else {
                 $messsage = " à été mis à jour avec succès avec succes";
             }
+            $mailMessage = $personne->getFirstname().' '.$personne->getName().' '.$messsage;
             
             $this->addFlash('success', $personne->getName().$messsage);
+            $mailer->sendEmail($mailMessage);
             // Rediriger vers la liste des personnes
             return $this->redirectToRoute('personne.list');
         } else {

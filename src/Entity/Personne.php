@@ -34,7 +34,7 @@ class Personne
     #[ORM\Column(type: Types::SMALLINT)]
     private ?int $age = null;
 
-    #[ORM\OneToOne(inversedBy: 'personne', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'personnes')]
     private ?Profile $profile = null;
 
     #[ORM\ManyToMany(targetEntity: Hobbie::class)]
