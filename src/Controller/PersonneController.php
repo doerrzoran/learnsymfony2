@@ -127,8 +127,7 @@ class PersonneController extends AbstractController
             } else {
                 $messsage = " à été mis à jour avec succès avec succes";
             }
-            $mailMessage = $personne->getFirstname().' '.$personne->getName().' '.$messsage;
-            
+            $mailMessage = $personne->getFirstname().' '.$personne->getName().' '.$messsage;    
             $this->addFlash('success', $personne->getName().$messsage);
             $mailer->sendEmail($mailMessage);
             // Rediriger vers la liste des personnes
