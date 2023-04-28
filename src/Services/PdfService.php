@@ -26,6 +26,18 @@ class PdfService
         $this->domPdf->render();
     }
 
+    public function helloPdf($html)
+    {
+        // Load HTML content 
+        $this->domPdf->loadHtml($html); 
+        // (Optional) Setup the paper size and orientation 
+        $this->domPdf->setPaper('A4', 'landscape'); 
+        // Render the HTML as PDF 
+        $this->domPdf->render(); 
+        // Output the generated PDF to Browser 
+        $this->domPdf->stream();
+    }
+
     public function showPdfFile($html){
         // $this->domPdf->loadHtml($html);
         // $this->domPdf->render();

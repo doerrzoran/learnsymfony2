@@ -42,10 +42,15 @@ class PersonneController extends AbstractController
     #
 
     #[Route("/pdf/{id}", name:"personne.pdf")]
-    public function generatePdfPersonne(Personne $personne = null, PdfService $pdf)
+    public function generatePdfPersonne(ManagerRegistry $doctrine, $id, PdfService $pdf): Response 
     {
-        $html = $this->render('personne/detail.html.twig', ['personne' => $personne]);
-        $pdf->showPdfFile($html);
+        $repository = new PersonneRepository($doctrine);
+        $personne = $repository->find($id);
+        $info = '<h1> '.$personne->getName().' '.$personne->getFirstname().'</h1>'.$personne->getAge().'<br><h2>'.$personne->getJob().'</h2><br>'.$personne->getProfile();
+        
+        // var_dump($personne);
+        $pdf->helloPdf($info);
+        return $this->render('personne/detail.html.twig', ['personne' => $personne]);
     }
 
     #[Route('/alls/{page?1}/{nbre?12}', name: 'personne.list.alls')]
