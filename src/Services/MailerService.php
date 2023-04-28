@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 
 class MailerService
 {
@@ -19,7 +21,9 @@ class MailerService
             //->priority(Email::PRIORITY_HIGH)
             ->subject('Time for Symfony Mailer!')
             ->text('sending')
-            ->html($content);
+            ->html($content)
+            ->attachPart(new DataPart('hello world'));
+            
 
         $this->mailer->send($email);
 
